@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 class MainActivity : AppCompatActivity() {
 
     private val sharedPrefs by lazy{ getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)}
-
+    private val prefDoc:String = "theme_prefs"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -37,32 +37,30 @@ class MainActivity : AppCompatActivity() {
         var themeGroup: RadioGroup = findViewById(R.id.themeGroup)
         themeGroup.setOnCheckedChangeListener { _, checkedId ->
             when(checkedId){
-                R.id.LightButton -> setTheme(AppCompatDelegate.MODE_NIGHT_NO, 0)
-                R.id.DarkButton -> setTheme(AppCompatDelegate.MODE_NIGHT_YES, 1)
-                R.id.AutoButton -> setTheme(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY, 2)
+                R.id.LightButton -> setCustomTheme(AppCompatDelegate.MODE_NIGHT_NO)
+                R.id.DarkButton -> setCustomTheme(AppCompatDelegate.MODE_NIGHT_YES)
+                R.id.AutoButton -> setCustomTheme(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
         }
     }
 
-    private fun setTheme(theme : Int, prefs: Int){
+    fun setCustomTheme(theme : Int){
         AppCompatDelegate.setDefaultNightMode(theme)
-        saveTheme(prefs)
+        saveTheme(theme)
     }
     private fun initTheme(){
         val lightButton: RadioButton = findViewById(R.id.LightButton)
         val darkButton: RadioButton = findViewById(R.id.DarkButton)
         val autoButton: RadioButton = findViewById(R.id.AutoButton)
         when(getSavedTheme()){
-            0 -> lightButton.isChecked = true
-            1 -> darkButton.isChecked = true
-            2-> autoButton.isChecked = true
-            -1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-
+            AppCompatDelegate.MODE_NIGHT_NO -> lightButton.isChecked = true
+            AppCompatDelegate.MODE_NIGHT_YES -> darkButton.isChecked = true
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM-> autoButton.isChecked = true
 
         }
     }
-    private fun saveTheme(theme : Int) = sharedPrefs.edit().putInt("prefs.theme", theme).apply()
+    private fun saveTheme(theme : Int) = sharedPrefs.edit().putInt(prefDoc, theme).apply()
 
-    private fun getSavedTheme() = sharedPrefs.getInt("prefs.theme", -1)
+    private fun getSavedTheme() = sharedPrefs.getInt(prefDoc, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 }
 
